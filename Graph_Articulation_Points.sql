@@ -1,6 +1,6 @@
 /*
 Program     : Graph Articulation Points
-Description : Finds articulation points of a given connected graph in Postgre SQL using functions and relational programming
+Description : Finds articulation points of a given connected graph in PostgreSQL using functions and relational programming
 Author      : Jigar Madia 
 Email       : jigarmadia@gmail.com
 */
