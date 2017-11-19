@@ -158,7 +158,6 @@ Expected Output :
  Clusters created
 (1 row)
 
-
  cluster |  x   |  y  |   points
 ---------+------+-----+-------------
        1 | 1.25 | 1.5 | {1,2}
