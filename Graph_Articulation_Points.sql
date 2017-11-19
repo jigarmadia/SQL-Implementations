@@ -120,18 +120,6 @@ SELECT * FROM articulation_points;
 /*
 Expected Output : 
 
-CREATE TABLE
-CREATE TABLE
-CREATE TABLE
-CREATE FUNCTION
-CREATE FUNCTION
-CREATE FUNCTION
-INSERT 0 1
-INSERT 0 1
-INSERT 0 1
-INSERT 0 1
-INSERT 0 1
-INSERT 0 1
   collect_articulation_nodes
 ------------------------------
  Articulation Nodes Collected
