@@ -1,6 +1,6 @@
 /*
 Program     : Powerset
-Description : Create a Powerset list of elements in Postgre SQL using functions and relational programming
+Description : Create a Powerset list of elements in PostgreSQL using functions and relational programming
 Author      : Jigar Madia 
 Email       : jigarmadia@gmail.com
 */
