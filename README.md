@@ -1,5 +1,6 @@
 # sql_implementations
-SQL Implementations of some Algorithms like 
+SQL Implementations of some Algorithms
+
 > K-Means
 
 > Minimum Spanning Tree
