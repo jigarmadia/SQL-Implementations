@@ -1,3 +1,9 @@
+/*
+Program     : Powerset
+Description : Create a Powerset list of elements in Postgre SQL using functions and relational programming
+Author      : Jigar Madia 
+Email       : jigarmadia@gmail.com
+*/
 
 CREATE TABLE A(x integer, 
                PRIMARY KEY(x));
