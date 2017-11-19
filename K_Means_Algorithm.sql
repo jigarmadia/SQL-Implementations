@@ -40,9 +40,9 @@ CREATE OR REPLACE FUNCTION get_new_cluster(point_x float, point_y float)
  RETURNS integer AS
  $$
  	DECLARE cluster integer;
- 			    distance float;
- 			    c record;
- 			    c_distance float;
+ 		distance float;
+ 		c record;
+ 		c_distance float;
  	BEGIN
  		
     --Initialize cluster value and set maximum distance for initial comparison
@@ -77,10 +77,10 @@ CREATE OR REPLACE FUNCTION assign_clusters()
  	
   --Find the nearest centroid by calculating distance of point from all centroids and update if necessary
  	UPDATE points p 
-     SET cluster = pn.new_cluster
+ 	   SET cluster = pn.new_cluster
  	  FROM ( SELECT p.point, get_new_cluster(p.x, p.y) AS new_cluster
- 	  		     FROM points p 
-          ) pn
+ 	  	   FROM points p 
+          	) pn
  	 WHERE p.point = pn.point;
 
  $$ LANGUAGE SQL;
@@ -98,31 +98,31 @@ CREATE OR REPLACE FUNCTION assign_clusters()
       --While condition gets the average of x and y values of points assigned to that cluster and compares with current values
       --We stop when the values dont change and cluster allocation is consistent
   		WHILE EXISTS( SELECT 1 FROM clusters c
-  					         WHERE c.x != ( SELECT avg(p.x) 
-                                      FROM points p 
-                                     WHERE cluster = c.cluster 
-                                  )
-  					   	        OR c.y != ( SELECT avg(p.y) 
-                                      FROM points p 
-                                     WHERE cluster = c.cluster 
-                                  ) 
-                  )
+  			       WHERE c.x != ( SELECT avg(p.x) 
+                                  		FROM points p 
+                                     	       WHERE cluster = c.cluster 
+                                  	     )
+  				  OR c.y != ( SELECT avg(p.y) 
+                                     	        FROM points p 
+                                     	       WHERE cluster = c.cluster 
+                                  	     ) 
+                  	      )
   		 LOOP
        --Since centroid values have changed, we update new values to centroids
   		 	UPDATE clusters c 
   		 	   SET x = ( SELECT avg(p.x) 
-                       FROM points p 
-                      WHERE cluster = c.cluster 
-                    ),
-  		 		     y = ( SELECT avg(p.y) 
-                       FROM points p 
-                      WHERE cluster = c.cluster 
-                    );
+                       		       FROM points p 
+                      		      WHERE cluster = c.cluster 
+                    		    ),
+  		 	       y = ( SELECT avg(p.y) 
+                       		       FROM points p 
+                      		      WHERE cluster = c.cluster 
+                    		    );
         
         --Assign points to new clusters based on new centroid values               
   		 	PERFORM assign_clusters();
   		 
-       END LOOP;
+       		  END LOOP;
   	END;
 
   $$ LANGUAGE plpgsql;
@@ -135,11 +135,11 @@ SELECT 'Clusters created' AS create_k_means_clusters FROM k_means();
 
 --Display clusters with new centroid values and collection of points in cluster
 SELECT c.cluster, c.x, c.y, 
-	     ( SELECT ARRAY( SELECT p.point 
-	   			               FROM points p 
-	   				 	          WHERE p.cluster = c.cluster 
-                      ) 
-       ) AS points 
+       ( SELECT ARRAY( SELECT p.point 
+	 		 FROM points p 
+	   		WHERE p.cluster = c.cluster 
+                     ) 
+       	) AS points 
   FROM clusters c;
 
 /*
