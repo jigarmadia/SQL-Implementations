@@ -21,10 +21,10 @@ INSERT INTO directed_graph VALUES(4,1);
 INSERT INTO hits_score
  SELECT g.node, 1.0, 1.0 
    FROM ( SELECT DISTINCT g.source AS node 
-				 		FROM directed_graph g
-				 	 UNION 
-					SELECT DISTINCT g.target AS node 
-						FROM directed_graph g
+            FROM directed_graph g
+           UNION 
+           SELECT DISTINCT g.target AS node 
+             FROM directed_graph g
 				) g;
 
 SELECT * FROM directed_graph;
