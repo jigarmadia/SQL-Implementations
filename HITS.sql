@@ -54,8 +54,8 @@ CREATE OR REPLACE FUNCTION calculate_HITS_score(k integer)
 
  		 	 	--If there are incoming paths for this node, we calculate authority score by sum of all hub scores of incoming nodes
  		 	 	IF EXISTS( SELECT 1 
-										 FROM directed_graph 
-										WHERE target = n.node 
+                     FROM directed_graph 
+                    WHERE target = n.node 
 								  ) THEN
                  
  		 	 		SELECT INTO a_score sum(n1.hub_score) 
