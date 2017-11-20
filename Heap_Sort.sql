@@ -6,13 +6,15 @@ Email       : jigarmadia@gmail.com
 */
 
 CREATE TABLE data(index integer, 
-				  value integer, 
-				  PRIMARY KEY(index));
+                  value integer, 
+                  PRIMARY KEY(index));
+                  
 CREATE TABLE heap_data(index integer, 
-					   value integer, 
-					   PRIMARY KEY(index));
+                       value integer, 
+                       PRIMARY KEY(index));
+                       
 CREATE TABLE sorted_data(index integer, 
-						 value integer);
+                         value integer);
 
 --This function is called to swap 2 node values if parent node value is greater than child node value.
 --It however works on any 2 nodes even if they are not parent and child
@@ -20,22 +22,22 @@ CREATE OR REPLACE FUNCTION heap_swap(parent_index integer, child_index integer)
  RETURNS boolean AS
  $$
  	DECLARE parent_value integer;
- 			child_value integer;
+          child_value integer;
  	BEGIN 
  		--Get Parent value
  		SELECT INTO parent_value h.value 
- 		  FROM heap_data h 
- 		 WHERE h.index = parent_index;
+      FROM heap_data h 
+     WHERE h.index = parent_index;
 
  		IF EXISTS( SELECT 1 
- 					 FROM heap_data h 
- 					WHERE h.index = child_index 
- 				 ) THEN 	
+                 FROM heap_data h 
+                WHERE h.index = child_index 
+              ) THEN 	
 
  			--Get child value
  			SELECT INTO child_value h.value 
- 			  FROM heap_data h 
- 			 WHERE h.index = child_index;
+        FROM heap_data h 
+       WHERE h.index = child_index;
 
  			--Swap if parent is less than child
  			IF ( parent_value < child_value) THEN 			
@@ -81,14 +83,15 @@ CREATE OR REPLACE FUNCTION heap_insert(x integer)
  RETURNS void AS
  $$
  	DECLARE x_index integer;
- 			parent_index integer;
- 			data_swapped boolean;
+          parent_index integer;
+          data_swapped boolean;
  	BEGIN
 		
 		--If heap is empty insert as root in position 1 else get the maximum index value
 		IF EXISTS( SELECT 1 
-					 FROM heap_data h 
-					LIMIT 1 ) THEN 
+                 FROM heap_data h 
+                LIMIT 1 
+              ) THEN 
  			SELECT INTO x_index max(h.index) 
  			  FROM heap_data h;
  		ELSE 
@@ -104,11 +107,11 @@ CREATE OR REPLACE FUNCTION heap_insert(x integer)
  		IF ( x_index > 1 ) THEN
 
  			SELECT INTO parent_index * 
- 			  FROM get_parent_index(x_index);
+        FROM get_parent_index(x_index);
 
  			--Swap data with parent if needed, returns false if no change
  			SELECT INTO data_swapped * 
- 			  FROM heap_swap(parent_index, x_index);
+        FROM heap_swap(parent_index, x_index);
 
  			--Keep swapping and bubbling the new node up the hierarchy till it is less than its parent value
  			WHILE (data_swapped = true) 
@@ -116,10 +119,10 @@ CREATE OR REPLACE FUNCTION heap_insert(x integer)
  			 	x_index := parent_index;
 
  				SELECT INTO parent_index * 
- 				  FROM get_parent_index(x_index);
+          FROM get_parent_index(x_index);
 
  				SELECT INTO data_swapped * 
- 				  FROM heap_swap(parent_index, x_index);
+          FROM heap_swap(parent_index, x_index);
  			 END LOOP;
  		END IF;
 
@@ -132,35 +135,35 @@ CREATE OR REPLACE FUNCTION heap_extract(x integer)
  RETURNS void AS
  $$
  	DECLARE x_index integer;
- 			x_value integer;
- 			l_index integer;
- 			r_index integer;
- 			l_value integer;
- 			r_value integer;
- 			largest_index integer;
- 			largest_value integer;
- 			max_index integer;
- 			data_swapped boolean;
+          x_value integer;
+          l_index integer;
+          r_index integer;
+          l_value integer;
+          r_value integer;
+          largest_index integer;
+          largest_value integer;
+          max_index integer;
+          data_swapped boolean;
  	BEGIN
  		
  		x_index := 0;
 
  		--Get the index of value to be deleted
  		SELECT INTO x_index h.index 
- 		  FROM heap_data h 
- 		 WHERE h.value = x;
+      FROM heap_data h 
+     WHERE h.value = x;
 
  		--Check if the element exists in the heap
  		IF ( x_index != 0 ) THEN
 
  			--Get max index to swap with node to be deleted
  			SELECT INTO max_index max(h.index) 
- 			  FROM heap_data h; 
+        FROM heap_data h; 
 
  			--If node to be deleted is not max node, swap them
  			IF ( x_index != max_index ) THEN
  				SELECT INTO data_swapped * 
- 				  FROM heap_swap(max_index, x_index);
+          FROM heap_swap(max_index, x_index);
  			END IF;
  			
  			--Delete max node
@@ -245,10 +248,16 @@ CREATE OR REPLACE FUNCTION heap_sort()
  		--Keep popping largest elements from max heap and add them in sorted_data table
  		WHILE (max_size >= 1)
  		LOOP	
- 			SELECT INTO root_value h.value FROM heap_data h WHERE h.index = 1;
+ 			SELECT INTO root_value h.value 
+        FROM heap_data h 
+       WHERE h.index = 1;
+       
  			INSERT INTO sorted_data VALUES(max_size,root_value);
+      
  			PERFORM heap_extract(root_value);
+      
  			max_size := max_size - 1;
+      
  		END LOOP;
 
  	END;
