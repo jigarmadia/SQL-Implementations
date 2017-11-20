@@ -17,7 +17,7 @@ INSERT INTO directed_graph VALUES(1,3);
 INSERT INTO directed_graph VALUES(3,4);
 INSERT INTO directed_graph VALUES(4,1);
 
---Insert all nodes in hits_score table and set default hub and authority scores to 1
+--Insert all nodes in hits_score table and set default hub and authority score to 1
 INSERT INTO hits_score
  SELECT g.node, 1.0, 1.0 
    FROM ( SELECT DISTINCT g.source AS node 
