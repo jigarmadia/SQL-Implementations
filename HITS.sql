@@ -5,8 +5,11 @@ Author      : Jigar Madia
 Email       : jigarmadia@gmail.com
 */
 
-CREATE TABLE directed_graph(source integer, target integer);
-CREATE TABLE hits_score(node integer, hub_score float, authority_score float);
+CREATE TABLE directed_graph(source integer, 
+                            target integer);
+CREATE TABLE hits_score(node integer, 
+                        hub_score float, 
+                        authority_score float);
 
 INSERT INTO directed_graph VALUES(1,2);
 INSERT INTO directed_graph VALUES(3,2);
@@ -16,12 +19,13 @@ INSERT INTO directed_graph VALUES(4,1);
 
 --Insert all nodes in hits_score table and set default hub and authority scores to 1
 INSERT INTO hits_score
- SELECT g.node, 1.0, 1.0 FROM ( SELECT DISTINCT g.source AS node 
- 								  FROM directed_graph g
- 					  	  		 UNION 
- 					  	  		SELECT DISTINCT g.target AS node 
- 					  	  		  FROM directed_graph g
- 					  	  	   ) g;
+ SELECT g.node, 1.0, 1.0 
+   FROM ( SELECT DISTINCT g.source AS node 
+ 								   FROM directed_graph g
+ 					  	  UNION 
+ 					  		SELECT DISTINCT g.target AS node 
+ 					  	   FROM directed_graph g
+ 					   ) g;
 
 SELECT * FROM directed_graph;
 
@@ -30,14 +34,14 @@ CREATE OR REPLACE FUNCTION calculate_HITS_score(k integer)
  RETURNS void AS
  $$
  	DECLARE i integer;
- 			norm float;
- 			a_score float;
- 			h_score float;
- 			n record;
+ 		 	     norm float;
+ 				     a_score float;
+ 				     h_score float;
+ 				     n record;
  	BEGIN
+  
  		FOR i IN 1..k
  		 LOOP
-
  		 	--Normalization factor for convergence
  		 	norm := 0;
 
@@ -50,14 +54,17 @@ CREATE OR REPLACE FUNCTION calculate_HITS_score(k integer)
 
  		 	 	--If there are incoming paths for this node, we calculate authority score by sum of all hub scores of incoming nodes
  		 	 	IF EXISTS( SELECT 1 
- 		 	 				 FROM directed_graph 
- 		 	 				WHERE target = n.node 
- 		 	 			  ) THEN
+ 		 	 				          FROM directed_graph 
+ 		 	 					        WHERE target = n.node 
+ 		 	 			        ) THEN
+                 
  		 	 		SELECT INTO a_score sum(n1.hub_score) 
  		 	 		  FROM hits_score n1 
- 		 	  NATURAL JOIN ( SELECT g.source AS node 
- 		 	  				   FROM directed_graph g 
- 		 	  				  WHERE g.target = n.node ) g;
+  NATURAL JOIN ( SELECT g.source AS node 
+ 		 	  				        FROM directed_graph g 
+ 		 	  				       WHERE g.target = n.node 
+                ) g;
+                
  		 	  	END IF;
 
  		 	  	--Update the authority score of node
@@ -75,8 +82,8 @@ CREATE OR REPLACE FUNCTION calculate_HITS_score(k integer)
  		 	--Normalize the authority scores of nodes using norm value
  		 	UPDATE hits_score SET authority_score = o.a_score/norm
  		 	  FROM ( SELECT node AS n, authority_score AS a_score 
- 		 	  		   FROM hits_score ) o
- 		 	  WHERE node = o.n;
+ 		 	  		       FROM hits_score ) o
+ 		 	          WHERE node = o.n;
 
  		 	--Repeat all steps above to calculate hub scores from incomming node authority scores and update.
  		 	norm := 0;
@@ -87,14 +94,17 @@ CREATE OR REPLACE FUNCTION calculate_HITS_score(k integer)
  		 	 	h_score := 0;
 
  		 	 	IF EXISTS( SELECT 1 
- 		 	 				 FROM directed_graph 
- 		 	 				WHERE source = n.node 
- 		 	 			  ) THEN
+ 		 	 				          FROM directed_graph 
+ 		 	 				         WHERE source = n.node 
+ 		 	 			        ) THEN
+                 
  		 	 		SELECT INTO h_score sum(n1.authority_score) 
  		 	 		  FROM hits_score n1 
- 		 	  NATURAL JOIN ( SELECT g.source AS node 
- 		 	  				   FROM directed_graph g 
- 		 	  				  WHERE g.source = n.node ) g;
+  NATURAL JOIN ( SELECT g.source AS node 
+ 		 	  				        FROM directed_graph g 
+ 		 	  				       WHERE g.source = n.node 
+               ) g;
+               
  		 	  	END IF;
 
  		 	  	UPDATE hits_score 
@@ -109,7 +119,8 @@ CREATE OR REPLACE FUNCTION calculate_HITS_score(k integer)
 
  		 	UPDATE hits_score SET hub_score = o.h_score/norm
  		 	  FROM ( SELECT node AS n, hub_score AS h_score 
- 		 	  		   FROM hits_score ) o
+ 		 	  		       FROM hits_score 
+             ) o
  		 	  WHERE node = o.n;
 
  		 END LOOP;
