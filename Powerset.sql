@@ -52,23 +52,23 @@ CREATE OR REPLACE FUNCTION generate_powerset()
         
         --Powerset entries with row_count cardinality
   		 	  powerset_entries AS ( SELECT ap.xa 
-                                FROM A_Powerset ap
-  		 						                    WHERE CARDINALITY(ap.xa) = i 
-                             ),
+                                  FROM A_Powerset ap
+  		 						               WHERE CARDINALITY(ap.xa) = i 
+                               ),
                              
         --New row combinations by multiplying original with powerset_entries of cardinality i 
         --We dont consider combinations where original entry is already in the multiplying powerset entry
         --and original entries which are greater than any of the elements in the multiplying powerset collection
         --to maintain unique combinations 
   		 	  new_rows AS ( SELECT o.x, p.xa 
-  		 			                FROM original_entries o, powerset_entries p
-  		 			   	           WHERE NOT ( o.x = SOME(p.xa) )
-  		 			   	 	               AND o.x < ALL(p.xa) 
+  		 			              FROM original_entries o, powerset_entries p
+  		 			   	         WHERE NOT ( o.x = SOME(p.xa) )
+  		 			   	 	             AND o.x < ALL(p.xa) 
                      )
                      
         --Merge possible combinations in one array and add to powerset table
   		 	  INSERT INTO A_Powerset SELECT merge_array_value(nr.x,nr.xa) 
-                                 FROM new_rows nr;
+                                   FROM new_rows nr;
 
   		 END LOOP;
   	END
